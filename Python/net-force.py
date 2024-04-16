@@ -22,7 +22,7 @@ class Planet:
 
 
 # https://nssdc.gsfc.nasa.gov/planetary/factsheet/
-v_mw = 0 #720000 # m/s
+v_mw = 720000 * 60 * 60 # m/s
 jupiter = Planet("Jupiter", 1.898e27, [778.5e13, 0, 0], [0, 13.1e6, v_mw])
 saturn  = Planet("Saturn", 5.683e+26, [0.0, 1432.0e13, 0], [-9.7e6, 0, v_mw])
 sun     = Planet("Sun", 1.989e30, [0.0, 0, 0], [0.0, 0, v_mw])
@@ -82,8 +82,7 @@ for planet in planets:
     ax.plot(transpose[0], transpose[1], transpose[2])
 
 
-plt.show()
+# plt.show()
 
 # plt.plot(np.transpose(sun.path)[0])
 # plt.show()
-
