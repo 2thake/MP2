@@ -5,7 +5,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from itertools import product, combinations
 from matplotlib.colors import LightSource
 from matplotlib.image import imread
-from tvtk.api import tvtk
 
 # %%
 fig = plt.figure()
