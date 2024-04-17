@@ -24,7 +24,7 @@ class Planet:
 
 
 # https://nssdc.gsfc.nasa.gov/planetary/factsheet/
-v_mw = 0 #720000# * 60 * 60 # m/s
+v_mw = 720000# * 60 * 60 # m/s
 jupiter = Planet("Jupiter", 1.898e27, [778.5e13, 0, 0], [0, 13.1e6, v_mw], radius=1.42984e8/2, texture='Jupiter_2k.png')
 saturn  = Planet("Saturn", 5.683e+26, [0.0, 1432.0e13, 0], [-9.7e6, 0, v_mw], radius=1.20536e8/2, texture='Saturn_2k.png')
 sun     = Planet("Sun", 1.989e30, [0.0, 0, 0], [0.0, 0, v_mw], radius=6.96e8, texture='Venus_2k.png')
@@ -58,7 +58,7 @@ def normalize(v):
     return v/mag
 
 
-def place_planet(R, image, plot, position=[0,0,0], count=20):
+def place_planet(R, image, plot, position=[0,0,0], count=180):
     img = plt.imread(image)
 
     # define a grid matching the map size, subsample along with pixels
@@ -90,11 +90,11 @@ max_orbit = 0
 for planet in planets:
     d = np.linalg.norm(planet.position)
     if d > max_orbit:
-        max_orbit = d*1.5
+        max_orbit = d
 # max_orbit = np.max(neptune.position) * 1.5
 
-max_t = 40000000000
-h = 100000000
+max_t = 20000000000
+h = 1000000
 for i in range(0, int(max_t/h)):
     for planet in planets:
         planet.path.append(planet.position.copy())
@@ -118,6 +118,8 @@ plt.title('Solar System')
 plt.figure(figsize=[6, 6])
 for planet in planets:
     transpose = np.transpose(planet.path)
-    #ax.plot(transpose[0], transpose[1], transpose[2])
-    place_planet(planet.radius * 5000000, planet.texture, ax, planet.position, 50)
+    ax.plot(transpose[0], transpose[1], transpose[2])
+    place_planet(planet.radius * 5000000, planet.texture, ax, planet.position, 60)
 
+
+# %%
