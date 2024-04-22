@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# def dydt(t, y):
-#     return -y
+def dydt(t, y):
+    return -y
 
 
 
@@ -87,14 +87,14 @@ for i in range(0, int(xrange / h)):
 
 
 plt.figure(figsize=(6, 6))
-# plt.xlim(-2, 2)
-# plt.ylim(-2, 2)
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
 plt.plot(x, y)
 plt.scatter([0], [0])
-# t, y = euler(dydt, 0, 2)
-# plt.plot(t, y, label='euler')
+t, y = euler(dydt, 0, 3)
+plt.plot(t, y, label='euler')
 # t, y = runge_kutta(dydt, 0, 2)
 # plt.plot(t, y, label='runge-kutta')
 plt.grid(True)
-# plt.legend()
+plt.legend()
 plt.show()
