@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import planet
 from planet import Planet, place_planet
-from planet_movement import calc_force
+from planet_acceleration import calc_force
 from initial_value_solver import  RungeKutta4_v1, EulersMethod
 
 # https://nssdc.gsfc.nasa.gov/planetary/factsheet/
