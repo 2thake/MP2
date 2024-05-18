@@ -1,5 +1,6 @@
 from planet import Planet, place_planet
 from planet_acceleration import calc_force
+
 from body_problem import body_problem
 import numpy as np
 
