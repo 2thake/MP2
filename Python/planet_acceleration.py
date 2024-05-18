@@ -17,11 +17,11 @@ def calc_force(planet_obj, planets, update):
     total_force = np.array([0.0, 0.0, 0.0]) #Initialising the total force
     G = 6.67430e-11 #gravitational constant
 
-    total_force += update
+    # total_force += update
 
     for planet in planets: #iterating through all the other planets (only calculate the force wtr to curretn planet)
         if planet != planet_obj: 
-            position = (planet.position - planet_obj.position)#Position of the planet of interest wit respect to the other planets
+            position = (planet.position - planet_obj.position)+update#Position of the planet of interest wit respect to the other planets
             direction = normalize(position) #Fidningnthe direction by finding the unit vecotr 
             distance = np.linalg.norm(position)#findign the distance by finding the magnitude of the positios
             total_force += ((direction * planet.mass / (distance * distance)))# 
