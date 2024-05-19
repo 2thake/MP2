@@ -5,8 +5,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import planet
 from planet import Planet, place_planet
 from planet_acceleration import calc_force
-from initial_value_solver import  RungeKutta4_v1, EulersMethod
+from initial_value_solver import  RungeKutta4_v1, ABM_4
 from body_problem import r_values, calculating_C
+import csv 
 
 # https://nssdc.gsfc.nasa.gov/planetary/factsheet/
 #The following shows the creation of the planets. These values are intial conditions with values from the link above.
@@ -36,15 +37,32 @@ velocity = np.concatenate(velocity).tolist()
 bary_distance = r_values(mass, distance)
 C_val = calculating_C(mass)
 vector = np.concatenate((bary_distance[3:], velocity)) #not including the sun mass
-print(RungeKutta4_v1(vector, 1, 5, C_val))
+Storage = RungeKutta4_v1(vector, 0.025, 40, C_val)
+i = 0
+j = 12
+for planet in planets:
 
-# max_orbit = 0 #initialising max orbit to 0
-#               #This accounts for the maximum deviation from the centre of the planets orbits
-# for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
-#     d = np.linalg.norm(planet.position)
-#     if d > max_orbit:
-#         max_orbit = d
-# # max_orbit = np.max(neptune.position) *  5
+    if planet == sun:
+        continue
+    else:
+        planet.position = np.vstack((Storage[i], Storage[i+1], Storage[i+2]))
+        planet.velocity = np.vstack((Storage[j], Storage[j+1], Storage[j+2]))
+        i += 3
+        j += 3
+
+
+# print(jupiter.position)
+initial4 = Storage
+print(ABM_4(initial4, 1, 4, C_val))
+
+
+max_orbit = 0 #initialising max orbit to 0
+              #This accounts for the maximum deviation from the centre of the planets orbits
+for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
+    d = np.linalg.norm(planet.position)
+    if d > max_orbit:
+        max_orbit = d
+max_orbit = np.max(neptune.position) *  5
 
 # max_t = 20000000000 # maximum time 
 # h = 1000000 #time step
@@ -56,20 +74,20 @@ print(RungeKutta4_v1(vector, 1, 5, C_val))
 #         RungeKutta4_v1(planet, planets, h)
 #         # planet.position = EulersMethod(planet, planets, h)
 
-# fig = plt.figure(figsize=[8, 8])
-# ax = fig.add_subplot(111, projection='3d')
-# ax.set_box_aspect([1,1,1])
-# ax.set_xlim(-max_orbit, max_orbit)
-# ax.set_ylim(-max_orbit, max_orbit)
-# ax.set_zlim(-max_orbit, max_orbit)
-# ax.grid(False)
-# plt.title('Solar System')
+fig = plt.figure(figsize=[8, 8])
+ax = fig.add_subplot(111, projection='3d')
+ax.set_box_aspect([1,1,1])
+ax.set_xlim(-max_orbit, max_orbit)
+ax.set_ylim(-max_orbit, max_orbit)
+ax.set_zlim(-max_orbit, max_orbit)
+ax.grid(False)
+plt.title('Solar System')
 
-# plt.figure(figsize=[6, 6])
-# for planet in planets:
-#     transpose = np.transpose(planet.path)
-#     ax.plot(transpose[0], transpose[1], transpose[2])
-#     place_planet(planet.radius * 5000000, planet.texture, ax, planet.position, 60)
-# # %%
+plt.figure(figsize=[6, 6])
+for planet in planets:
+    transpose = np.transpose(planet.path)
+    ax.plot(transpose[0], transpose[1], transpose[2])
+    place_planet(planet.radius * 5000000, planet.texture, ax, planet.position, 60)
+# %%
 
-# plt.show()
+plt.show()
