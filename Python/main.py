@@ -56,38 +56,40 @@ initial4 =  RungeKutta4_v1(vector, 0.025, 4, C_val)
 print(ABM_4(initial4, 0.025, 40, C_val))
 
 
-# max_orbit = 0 #initialising max orbit to 0
-#               #This accounts for the maximum deviation from the centre of the planets orbits
-# for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
-#     d = np.linalg.norm(planet.position)
-#     if d > max_orbit:
-#         max_orbit = d
-# max_orbit = np.max(neptune.position) *  5
+max_orbit = 0 #initialising max orbit to 0
+               #This accounts for the maximum deviation from the centre of the planets orbits
+for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
+    d = np.linalg.norm(planet.position)
+    if d > max_orbit:
+        max_orbit = d
+max_orbit = np.max(neptune.position) *  5
 
-# # max_t = 20000000000 # maximum time 
-# # h = 1000000 #time step
+# max_t = 20000000000 # maximum time 
+# h = 1000000 #time step
 
-# # # Initial Value Problem
-# # for i in range(0, int(max_t/h)):
-# #     for planet in planets:
-# #         planet.path.append(planet.position.copy())  
-# #         RungeKutta4_v1(planet, planets, h)
-# #         # planet.position = EulersMethod(planet, planets, h)
+#Initial Value Problem
+for j, planet in enumerate(planets):
+   for i in range(0, 40):
+        planet.path.append(Storage[0+3*j:3+3*j, i])  
+        # RungeKutta4_v1(planet, planets, h)
+        # planet.position = EulersMethod(planet, planets, h)
 
-# fig = plt.figure(figsize=[8, 8])
-# ax = fig.add_subplot(111, projection='3d')
-# ax.set_box_aspect([1,1,1])
-# ax.set_xlim(-max_orbit, max_orbit)
-# ax.set_ylim(-max_orbit, max_orbit)
-# ax.set_zlim(-max_orbit, max_orbit)
-# ax.grid(False)
-# plt.title('Solar System')
+fig = plt.figure(figsize=[8, 8])
+ax = fig.add_subplot(111, projection='3d')
+ax.set_box_aspect([1,1,1])
+ax.set_xlim(-max_orbit, max_orbit)
+ax.set_ylim(-max_orbit, max_orbit)
+ax.set_zlim(-max_orbit, max_orbit)
+ax.grid(False)
+plt.title('Solar System')
 
-# plt.figure(figsize=[6, 6])
-# for planet in planets:
-#     transpose = np.transpose(planet.path)
-#     ax.plot(transpose[0], transpose[1], transpose[2])
-#     place_planet(planet.radius * 5000000, planet.texture, ax, planet.position, 60)
-# # %%
+plt.figure(figsize=[6, 6])
+for planet in planets:
+    transpose = np.transpose(planet.path)
+    ax.plot(transpose[0], transpose[1], transpose[2])
+    place_planet(planet.radius * 5000000, planet.texture, ax, planet.position, 60)
+plt.show()
+# %%
 
-# plt.show()
+
+# %%
