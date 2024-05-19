@@ -10,14 +10,14 @@ class Planet:
     velocity = [0, 0, 0] #initial velocity of the planet
 
     # Contructs the planet based on what has been initial given
-    def __init__(self, name, mass, position, velocity, radius=142984000/2, texture='Venus_2k.png'):
+    def __init__(self, name, mass, position, velocity, radius=142984000/2, texture=os.path.join("textures", "Venus_2k.png")):
         self.name = name
         self.mass = mass
         self.position = np.array(position)
         self.velocity = np.array(velocity) * 1.1 #scaling velocity by 1.1. After some experimentation, this value worked best
         self.path = []
-        textures_dir = os.path.abspath('textures')
-        self.texture = os.path.join(textures_dir, texture)
+        # textures_dir = os.path.abspath('textures')
+        self.texture = texture
         self.radius = radius
 
     def print_params(self):
@@ -56,5 +56,5 @@ def place_planet(R, image, plot, position=[0,0,0], count=180):
     z += position[2]
 
     # create 3d Axes
-    plot.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=1) # we've already pruned ourselves
+    plot.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=0.5) # we've already pruned ourselves
     # plt.show()

@@ -3,15 +3,13 @@ import numpy as np
 #This might be a boy problem
 def body_problem(vector, C):
     F = np.zeros(24)
-    F[0:12] = vector[12:24]  # Velocity components
-
+    F[0:11] = vector[12:23]  # Velocity components
     num_planet = int(np.sqrt(len(C)))
 
     for n in range(num_planet):
         r_vec = vector[3*n:3*(n+1)]  # Slice vector for 3D position
         r = np.linalg.norm(r_vec)  # Calculate the distance
-        F[12+3*n:15+3*n] = - (np.sum(C[4*n:4*(n+1)]) / (r**3)) * r_vec # Correctly update F with acceleration components
-        
+        F[12+3*n:15+3*n] =  (-np.sum(C[4*n:4*(n+1)]) / np.abs((r**3))) * r_vec # Correctly update F with acceleration components
     return F
 
 # C = 2.953485975463116e-04
@@ -27,16 +25,16 @@ def calculating_C(M):
     TU = 86400
     G = 6.67430e-11
 
-    for reference_planet in range(len(M)-1):
+    for reference_planet in range(1,len(M)):
         for planet in range(len(M)):
             if reference_planet == planet:
                 continue
             else:
-                C.append(((G * M[reference_planet]) * (TU ** 2) / (((M[planet] / M[reference_planet]) + 1) ** 2)) / (AU ** 3))
+                C.append(((G * M[planet]) * (TU ** 2) / (((M[reference_planet] / M[planet]) + 1) ** 2)) / (AU ** 3))
     return C
 
-M = [1.98855e30, 1.898e27, 3, 4, 5]
-test = calculating_C(M)
+# M = [1.98855e30, 1.898e27, 3, 4, 5]
+# test = calculating_C(M)
 # print(len(test))
 # print(test)
 

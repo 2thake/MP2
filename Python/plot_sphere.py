@@ -98,7 +98,7 @@ y = np.sin(phi) * np.sin(theta)
 z = np.cos(phi)
 
 # Load the texture image
-earth_texture = imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Earth_4k.png')  # Replace 'texture.png' with the path to your PNG image
+#earth_texture = imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Earth_4k.png')  # Replace 'texture.png' with the path to your PNG image
 plt.imshow(earth_texture)
 
 # %%
@@ -124,12 +124,12 @@ plt.show()
 
 
 # %%
-image = imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Earth_4k.png')
+#image = imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Earth_4k.png')
 
 plt.imshow(image)
 
 # %%
-img = plt.imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Jupiter_2k.png')
+#img = plt.imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Jupiter_2k.png')
 
 # define a grid matching the map size, subsample along with pixels
 theta = np.linspace(0, np.pi, img.shape[0])
@@ -197,4 +197,4 @@ def place_planet(R, image, position=[0,0,0], count=20):
     ax.axis('scaled')
 
 # %%
-place_planet(0.5, '/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/PythonJupiter_2k.png', [0, 5, 5])
+#place_planet(0.5, '/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/PythonJupiter_2k.png', [0, 5, 5])
