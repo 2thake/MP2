@@ -1,14 +1,17 @@
 import numpy as np
 
 #This might be a boy problem
-
 def body_problem(vector, C):
     F = np.zeros(24)
-    F[0:11] = vector[12:23]  # Velocity components
+    F[0:12] = vector[12:24]  # Velocity components
 
-    for n in np.arange(int(np.sqrt(len(C))+1)):
-        r = np.linalg.norm(vector[3*n:2+3*n])  # Distance
-        F[12+3*n:14+n*3] = np.sum(- (C[4*n:3+4*n] / (r**3))) * vector[3*n:2+3*n] # Acceleration components
+    num_planet = int(np.sqrt(len(C)))
+
+    for n in range(num_planet):
+        r_vec = vector[3*n:3*(n+1)]  # Slice vector for 3D position
+        r = np.linalg.norm(r_vec)  # Calculate the distance
+        F[12+3*n:15+3*n] = - (np.sum(C[4*n:4*(n+1)]) / (r**3)) * r_vec # Correctly update F with acceleration components
+        
     return F
 
 # C = 2.953485975463116e-04

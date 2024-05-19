@@ -36,7 +36,7 @@ velocity = np.concatenate(velocity).tolist()
 bary_distance = r_values(mass, distance)
 C_val = calculating_C(mass)
 vector = np.concatenate((bary_distance[3:], velocity)) #not including the sun mass
-RungeKutta4_v1(vector, 1, 5, C_val)
+print(RungeKutta4_v1(vector, 1, 5, C_val))
 
 # max_orbit = 0 #initialising max orbit to 0
 #               #This accounts for the maximum deviation from the centre of the planets orbits
