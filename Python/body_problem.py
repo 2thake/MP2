@@ -1,3 +1,4 @@
+# %%
 import numpy as np
 
 #This might be a boy problem

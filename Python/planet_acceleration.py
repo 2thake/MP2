@@ -1,3 +1,4 @@
+# %%
 import numpy as np
 
 # performs normalization on a vector

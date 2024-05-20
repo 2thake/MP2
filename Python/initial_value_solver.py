@@ -1,3 +1,5 @@
+# %%
+
 from planet import Planet, place_planet
 from planet_acceleration import calc_force
 
