@@ -14,7 +14,7 @@ AU = 149597870700 # astronomical unit in meters
 
 # https://nssdc.gsfc.nasa.gov/planetary/factsheet/
 #The following shows the creation of the planets. These values are intial conditions with values from the link above.
-v_mw = 400000000/AU# * 60 * 60 # m/s
+v_mw = 0# * 60 * 60 # m/s
 jupiter = Planet("Jupiter", 1.898e27, [2.657301572545939E+00, 4.244832633235739E+00, -7.706081756999565E-02], [-6.480998680299733E-03, 4.362422858591558E-03, 1.268648293569800E-04+v_mw], radius=2000000*69911/AU, texture= os.path.join("textures", "Jupiter_2k.png"))
 # jupiter = Planet("Jupiter", 1.898e27, [2.660511872500166e+00, 4.246331340893854e+00, -7.683955467163552e-02], [-5.923603532402550e-03, 3.369365015933616e-03, 2.621050098384081e-05], radius=10000000*69911/AU, texture= os.path.join("textures", "Jupiter_2k.png"))
 saturn  = Planet("Saturn", 5.683e+26, [9.211655736771199E+00, -2.998507001947348E+00, -3.146252679038145E-01], [1.415075980682737E-03, 5.293746502200081E-03, -1.483576235830070E-04+v_mw], radius=2000000*58232/AU, texture=os.path.join("textures", "Saturn_2k.png"))
@@ -39,11 +39,19 @@ N=10000
 distance = np.concatenate(distance).tolist()
 velocity = np.concatenate(velocity).tolist()
 
-# bary_distance = r_values(mass, distance)
+#Calculating C
 C_val = calculating_C(mass)
 
+#Concatenating vector
 vector = np.concatenate((distance[3:], velocity)) #not including the sun mass
-Storage = RungeKutta4_v1(vector, 0.5, N, C_val)
+
+#Applying Runge kutta 
+Storage_R = RungeKutta4_v1(vector, 0.5, N, C_val)
+
+#Applying Adam-Bashfourth Moulton
+initial4 =  RungeKutta4_v1(vector, 0.025, 4, C_val) #Initial 4 using Runge Kutta to put into ABM
+Storage = ABM_4(initial4, 0.5, N, C_val)
+
 i = 0
 j = 12
 sun_values = 0.5 * np.arange(N)
@@ -59,9 +67,7 @@ for planet in planets:
         j += 3
 
 
-# print(jupiter.position)
-initial4 =  RungeKutta4_v1(vector, 0.025, 4, C_val)
-#print(ABM_4(initial4, 0.025, 40, C_val))
+
 
 
 max_orbit = 0 #initialising max orbit to 0
