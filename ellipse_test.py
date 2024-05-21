@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 
+
 # %%
 p1 = np.array([0, 1])
 p2 = np.array([4, 4])
