@@ -1,0 +1,85 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2
+from planet import Planet, place_planet
+
+def animate(storage, planets):
+    # Create a figure and axis for the plot
+    fig, ax = plt.subplots()
+    sun = planets[0]
+    neptune = planets[-1]
+    # OpenCV VideoWriter
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec
+    fps = 30  # Frames per second
+    frame_size = (640, 480)  # Width and height of the video
+    out = cv2.VideoWriter('SolarSystem.mp4', fourcc, fps, frame_size)
+
+    # Loop to create frames
+    for N in range(storage.shape[1]):
+        # ax.clear()
+        # ax.plot(x[:i], y[:i], 'b')
+        # ax.set_xlim(-1.5, 1.5)
+        # ax.set_ylim(-1.5, 1.5)
+        # ax.set_title(f'Frame {i+1}/{len(theta)}')
+        i = 0
+        j = storage.shape[0]//2
+        for planet in planets:
+            if planet == sun:
+                continue
+                # planet.position = planet.position + (planet.velocity * sun_values.reshape((-1,1)))
+            else:
+                planet.position = np.vstack((storage[i,N-1], storage[i+1,N-1], storage[i+2,N-1]))
+                planet.velocity = np.vstack((storage[j,N-1], storage[j+1,N-1], storage[j+2,N-1]))
+                i += 3
+                j += 3
+
+        max_orbit = 0 #initialising max orbit to 0
+        #This accounts for the maximum deviation from the centre of the planets orbits
+        for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
+            d = np.linalg.norm(planet.position)
+            if d > max_orbit:
+                max_orbit = d
+        max_orbit = np.max(neptune.position)
+
+        #Initial Value Problem
+        for j, planet in enumerate(planets):
+            for i in range(0, N):
+                planet.path.append(storage[0+3*j:3+3*j, i])  
+                # RungeKutta4_v1(planet, planets, h)
+                # planet.position = EulersMethod(planet, planets, h)
+
+        fig = plt.figure(figsize=[8, 8])
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_box_aspect([1,1,1])
+        ax.set_xlim(-max_orbit, max_orbit)
+        ax.set_ylim(-max_orbit, max_orbit)
+        ax.set_zlim(-max_orbit, max_orbit)
+        ax.grid(False)
+        plt.title('Solar System')
+
+        for planet in planets:
+            transpose = np.transpose(planet.path)
+            ax.plot(transpose[0], transpose[1], transpose[2])
+            place_planet(planet.radius, planet.texture, ax, planet.position, 60)
+
+        # Draw the canvas and convert to image
+        fig.canvas.draw()
+        img = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+        img = img.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+
+        # Convert RGB to BGR for OpenCV
+        img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+        # Resize image to frame size
+        img_resized = cv2.resize(img_bgr, frame_size)
+
+        # Write frame to video
+        out.write(img_resized)
+
+    # Release the video writer
+    out.release()
+
+    # Close the plot
+    plt.close(fig)
+
+    print("Video has been written successfully.")
