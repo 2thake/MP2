@@ -48,5 +48,5 @@ def place_planet(R, image, plot, position=[0,0,0], count=180):
     z += position[2]
 
     # create 3d Axes
-    plot.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=0.5) # we've already pruned ourselves
+    plot.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=1) # we've already pruned ourselves
     # plt.show()
