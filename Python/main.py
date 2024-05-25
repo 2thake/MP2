@@ -1,20 +1,16 @@
 # %%
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import planet
-from planet import Planet, place_planet
-from planet_acceleration import calc_force
+from planet import Planet
+from animation import animate
 from initial_value_solver import  RungeKutta4_v1, ABM_4
-from body_problem import r_values, calculating_C
-import csv 
+from body_problem import calculating_C
 import os
 
 AU = 149597870700 # astronomical unit in meters
 
 # https://nssdc.gsfc.nasa.gov/planetary/factsheet/
 #The following shows the creation of the planets. These values are intial conditions with values from the link above.
-v_mw = 0# * 60 * 60 # m/s
 scale = 3000000
 jupiter = Planet("Jupiter", 1.898e27, [2.657301572545939E+00, 4.244832633235739E+00, -7.706081756999565E-02], [-6.480998680299733E-03, 4.362422858591558E-03, 1.268648293569800E-04], radius=scale*69911/AU, texture= os.path.join("textures", "Jupiter_2k.png"))
 saturn  = Planet("Saturn", 5.683e+26, [9.211655736771199E+00, -2.998507001947348E+00, -3.146252679038145E-01], [1.415075980682737E-03, 5.293746502200081E-03, -1.483576235830070E-04], radius=scale*58232/AU, texture=os.path.join("textures", "Saturn_2k.png"))
@@ -39,13 +35,13 @@ N = 2000
 distance = np.concatenate(distance).tolist()
 velocity = np.concatenate(velocity).tolist()
 
-#Calculating C
+# Calculating C
 C_val = calculating_C(mass)
 
-#Concatenating vector
+# Concatenating vector
 vector = np.concatenate((distance[3:], velocity)) #not including the sun mass
-print("HIGH")
-print(C_val)
+# print("HIGH")
+# print(C_val)
 #Applying Runge kutta 
 Storage = RungeKutta4_v1(vector, 0.5, N, C_val)
 
@@ -54,57 +50,3 @@ initial4 =  RungeKutta4_v1(vector, 0.25, 4, C_val) #Initial 4 using Runge Kutta 
 Storage = ABM_4(initial4, 100, N, C_val)
 
 animate(Storage, planets)
-# i = 0
-# j = 12
-# sun_values = 0.5 * np.arange(N)
-# for planet in planets:
-
-#     if planet == sun:
-#         continue
-#         # planet.position = planet.position + (planet.velocity * sun_values.reshape((-1,1)))
-#     else:
-#         planet.position = np.vstack((Storage[i,N-1], Storage[i+1,N-1], Storage[i+2,N-1]))
-#         planet.velocity = np.vstack((Storage[j,N-1], Storage[j+1,N-1], Storage[j+2,N-1]))
-#         i += 3
-#         j += 3
-
-
-
-
-
-max_orbit = 0 #initialising max orbit to 0
-               #This accounts for the maximum deviation from the centre of the planets orbits
-for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
-    d = np.linalg.norm(planet.position)
-    if d > max_orbit:
-        max_orbit = d
-max_orbit = np.max(neptune.position)
-
-# # max_t = 20000000000 # maximum time 
-# # h = 1000000 #time step
-
-# #Initial Value Problem
-# for j, planet in enumerate(planets):
-#    for i in range(0, N):
-#         planet.path.append(Storage[0+3*j:3+3*j, i])  
-#         # RungeKutta4_v1(planet, planets, h)
-#         # planet.position = EulersMethod(planet, planets, h)
-
-# fig = plt.figure(figsize=[8, 8])
-# ax = fig.add_subplot(111, projection='3d')
-# ax.set_box_aspect([1,1,1])
-# ax.set_xlim(-max_orbit, max_orbit)
-# ax.set_ylim(-max_orbit, max_orbit)
-# ax.set_zlim(-max_orbit, max_orbit)
-# ax.grid(False)
-# plt.title('Solar System')
-
-for planet in planets:
-    transpose = np.transpose(planet.path)
-    ax.plot(transpose[0], transpose[1], transpose[2])
-    place_planet(planet.radius, planet.texture, ax, planet.position, 60)
-plt.show()
-# %%
-
-
-# %%

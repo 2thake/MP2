@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from planet import place_planet
-from matplotlib.colors import LightSource
+from io import BytesIO
 
 def animate(storage, planets):
 
@@ -16,9 +16,9 @@ def animate(storage, planets):
 
     # OpenCV VideoWriter
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec
-    fps = 120  # Frames per second
+    fps = 60  # Frames per second
 
-    out = cv2.VideoWriter('SolarSystemM2.mp4', fourcc, fps, frame_size)
+    out = cv2.VideoWriter('SolarSystemFixed.mp4', fourcc, fps, frame_size)
     num_frames = storage.shape[1]
 
     # Define the initial camera angles
@@ -54,6 +54,7 @@ def animate(storage, planets):
         ax.set_xlim(-max_orbit, max_orbit)
         ax.set_ylim(-max_orbit, max_orbit)
         ax.set_zlim(-max_orbit, max_orbit)
+        ax.set_facecolor((1, 1, 1, 0))  # Set axis background to be completely transparent
 
         for planet in planets:
             place_planet(planet.radius, planet.texture, ax, planet.position, 60)
@@ -69,13 +70,13 @@ def animate(storage, planets):
         # ax.view_init(elev=current_elev, azim=current_azim)
 
         # Save the plot as a PNG with a transparent background
-        fig.savefig('temp_frame1.png', transparent=True)
+        fig.savefig('temp_frameFixed.png', transparent=True)
 
-        # Read the saved PNG file
-        frame_with_transparency = cv2.imread('temp_frame1.png', cv2.IMREAD_UNCHANGED)
+        frame_with_transparency = cv2.imread('temp_frameFixed.png', cv2.IMREAD_UNCHANGED)
         frame_with_transparency = cv2.resize(frame_with_transparency, frame_size)
-        
+
         resized_background = cv2.resize(background_image, frame_size)
+
         # Split the image into BGR and Alpha channels
         bgr = frame_with_transparency[:, :, :3]
         alpha = frame_with_transparency[:, :, 3]
