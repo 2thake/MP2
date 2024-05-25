@@ -126,21 +126,21 @@ plt.show()
 # %%
 #image = imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Earth_4k.png')
 
-plt.imshow(image)
+# plt.imshow(image)
 
 # %%
 #img = plt.imread('/Users/lamiayous/Desktop/2023_2024/sem_2/modelling_simulation/MP2/Python/Jupiter_2k.png')
 
 # define a grid matching the map size, subsample along with pixels
-theta = np.linspace(0, np.pi, img.shape[0])
-phi = np.linspace(0, 2*np.pi, img.shape[1])
+# theta = np.linspace(0, np.pi, img.shape[0])
+# phi = np.linspace(0, 2*np.pi, img.shape[1])
 
-count = 180 # keep 180 points along theta and phi
-theta_inds = np.linspace(0, img.shape[0] - 1, count).round().astype(int)
-phi_inds = np.linspace(0, img.shape[1] - 1, count).round().astype(int)
-theta = theta[theta_inds]
-phi = phi[phi_inds]
-img = img[np.ix_(theta_inds, phi_inds)]
+# count = 180 # keep 180 points along theta and phi
+# theta_inds = np.linspace(0, img.shape[0] - 1, count).round().astype(int)
+# phi_inds = np.linspace(0, img.shape[1] - 1, count).round().astype(int)
+# theta = theta[theta_inds]
+# phi = phi[phi_inds]
+# img = img[np.ix_(theta_inds, phi_inds)]
 
 theta,phi = np.meshgrid(theta, phi)
 R = 2
@@ -157,7 +157,7 @@ z += 1
 # create 3d Axes
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=1) # we've already pruned ourselves
+# ax.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=1) # we've already pruned ourselves
 
 # make the plot more spherical
 ax.axis('scaled')

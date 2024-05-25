@@ -5,24 +5,15 @@ import matplotlib.pyplot as plt
 
 # Class that represent planets
 class Planet:
-    name = "" #name of plane
-    mass = 0 #intial mass
-    position = [0, 0, 0] #initial position of planet
-    velocity = [0, 0, 0] #initial velocity of the planet
-
     # Contructs the planet based on what has been initial given
-    def __init__(self, name, mass, position, velocity, radius=142984000/2, texture=os.path.join("textures", "Venus_2k.png")):
+    def __init__(self, name, mass, position, velocity, radius, texture):
         self.name = name
         self.mass = mass
         self.position = np.array(position)
-        self.velocity = np.array(velocity) * 1.1 #scaling velocity by 1.1. After some experimentation, this value worked best
+        self.velocity = np.array(velocity)  
         self.path = []
-        # textures_dir = os.path.abspath('textures')
         self.texture = texture
         self.radius = radius
-
-    def print_params(self):
-        print(self.name, self.mass, self.position, self.velocity)
     
 #Plotting planet onto a 3D surface 
 #This function takes in 5 arguments
@@ -57,5 +48,5 @@ def place_planet(R, image, plot, position=[0,0,0], count=180):
     z += position[2]
 
     # create 3d Axes
-    plot.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=0.5) # we've already pruned ourselves
+    plot.plot_surface(x.T, y.T, z.T, facecolors=img, cstride=1, rstride=1, shade=True, edgecolor='none', alpha=1) # we've already pruned ourselves
     # plt.show()
