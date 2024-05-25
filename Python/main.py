@@ -7,7 +7,6 @@ from planet import Planet, place_planet
 from planet_acceleration import calc_force
 from initial_value_solver import  RungeKutta4_v1, ABM_4
 from body_problem import r_values, calculating_C
-from animation import animate
 import csv 
 import os
 
@@ -45,9 +44,10 @@ C_val = calculating_C(mass)
 
 #Concatenating vector
 vector = np.concatenate((distance[3:], velocity)) #not including the sun mass
-
+print("HIGH")
+print(C_val)
 #Applying Runge kutta 
-Storage_R = RungeKutta4_v1(vector, 0.5, N, C_val)
+Storage = RungeKutta4_v1(vector, 0.5, N, C_val)
 
 #Applying Adam-Bashfourth Moulton
 initial4 =  RungeKutta4_v1(vector, 0.25, 4, C_val) #Initial 4 using Runge Kutta to put into ABM
@@ -72,13 +72,13 @@ animate(Storage, planets)
 
 
 
-# max_orbit = 0 #initialising max orbit to 0
-#                #This accounts for the maximum deviation from the centre of the planets orbits
-# for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
-#     d = np.linalg.norm(planet.position)
-#     if d > max_orbit:
-#         max_orbit = d
-# max_orbit = np.max(neptune.position)
+max_orbit = 0 #initialising max orbit to 0
+               #This accounts for the maximum deviation from the centre of the planets orbits
+for planet in planets: #iterating through all of the planets and calculating the euclidian distance, if this passes the max, set as new max
+    d = np.linalg.norm(planet.position)
+    if d > max_orbit:
+        max_orbit = d
+max_orbit = np.max(neptune.position)
 
 # # max_t = 20000000000 # maximum time 
 # # h = 1000000 #time step
@@ -99,8 +99,12 @@ animate(Storage, planets)
 # ax.grid(False)
 # plt.title('Solar System')
 
-# for planet in planets:
-#     transpose = np.transpose(planet.path)
-#     ax.plot(transpose[0], transpose[1], transpose[2])
-#     place_planet(planet.radius, planet.texture, ax, planet.position, 60)
-# plt.show()
+for planet in planets:
+    transpose = np.transpose(planet.path)
+    ax.plot(transpose[0], transpose[1], transpose[2])
+    place_planet(planet.radius, planet.texture, ax, planet.position, 60)
+plt.show()
+# %%
+
+
+# %%
