@@ -5,6 +5,8 @@ from planet import Planet
 # from animation import animate
 from initial_value_solver import  RungeKutta4_v1, ABM_4
 from body_problem import calculating_C
+from num_quadrature_copy import find_dA
+import matplotlib.pyplot as plt
 import os
 
 AU = 149597870700 # astronomical unit in meters
@@ -31,7 +33,8 @@ mass = [sun.mass, jupiter.mass, saturn.mass, uranus.mass, neptune.mass]
 distance = [sun.position, jupiter.position, saturn.position, uranus.position, neptune.position]
 velocity = [jupiter.velocity, saturn.velocity, uranus.velocity, neptune.velocity]
 
-N = 2000
+N = 1000
+H = 100
 distance = np.concatenate(distance).tolist()
 velocity = np.concatenate(velocity).tolist()
 
@@ -47,8 +50,65 @@ Storage = RungeKutta4_v1(vector, 0.5, N, C_val)
 
 #Applying Adam-Bashfourth Moulton
 initial4 =  RungeKutta4_v1(vector, 0.25, 4, C_val) #Initial 4 using Runge Kutta to put into ABM
-Storage = ABM_4(initial4, 100, N, C_val)
+Storage = ABM_4(initial4, H, N, C_val)
 
-print(Storage)
+
+def truncate_path(path, sun_pos, orbital_period, h):
+    diff = path[0] - sun_2D
+    threshold_angle = 2*np.pi*H/orbital_period
+    theta_init = np.arctan2(diff[1], diff[0])
+    for i in range(10, len(path)):
+        diff = path[i]-sun_2D
+        theta = np.arctan2(diff[1], diff[0])
+        if np.isclose(theta, theta_init, atol=threshold_angle) and theta < theta_init:
+            end_index = i
+            break
+    
+    return path[:end_index]
+
+sun_2D = np.array([sun.position[0], sun.position[1]])
+
+path = np.array([Storage[0], Storage[1]]).transpose()
+
+orbital_period = 60000
+names = ['Jupiter', 'Saturn', 'Uranus', 'Neptune']
+
+
+paths = []
+for i in range(len(names)):
+    path = np.array([Storage[3*i], Storage[3*i+1]]).transpose()
+    path = truncate_path(path, sun_2D, orbital_period, H)
+    paths.append(path)
+    plt.plot(path.transpose()[0], path.transpose()[1])
+
+
+
+# plt.plot(path.transpose()[0], path.transpose()[1])
+plt.scatter(sun.position[0], sun.position[1])
+plt.axis('equal')
+plt.show()
+
+
+areas = []
+for j in range(0, len(names)):
+    area_slice = []
+    print(names[j])
+    for i in range(5, int((len(paths[j])-2)/2)):
+        area_slice.append(find_dA(sun_2D, paths[j][2*i], paths[j][2*i+1], paths[j][2*i+2]))
+    areas.append(area_slice)
+    plt.plot(area_slice, label=names[j])
+    
+
+
+plt.title(f'Area Traced by Each Planet in {H}-Day Timesteps')
+plt.xlabel(r'Area ($AU^2$)')
+plt.ylabel(r'Timestep (n)')
+plt.legend(loc='lower right')
+# plt.ylim(0, max([max(ar) for ar in paths])*1.2)
+plt.ylim(0, 10)
+plt.show()
+
 
 # animate(Storage, planets)
+
+# %%

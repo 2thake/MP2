@@ -5,29 +5,31 @@ import matplotlib.pyplot as plt
 import math
 
 # %%
-def rotate_points(x, y, rad):
-    cos_a, sin_a = np.cos(rad), np.sin(rad)
-    x_new = cos_a * np.array(x) - sin_a * np.array(y)
-    y_new = sin_a * np.array(x) + cos_a * np.array(y)
-    return x_new.tolist(), y_new.tolist()
 
-# sample unit circle path to show the area comes out to pi
+if __name__ == '__main__':
+    def rotate_points(x, y, rad):
+        cos_a, sin_a = np.cos(rad), np.sin(rad)
+        x_new = cos_a * np.array(x) - sin_a * np.array(y)
+        y_new = sin_a * np.array(x) + cos_a * np.array(y)
+        return x_new.tolist(), y_new.tolist()
 
-N = 101
-theta = np.linspace(0, 2*np.pi, N)
+    # sample unit circle path to show the area comes out to pi
 
-a = 1
-b = 1.5
-c = np.sqrt(a*a+b*b)
+    N = 101
+    theta = np.linspace(0, 2*np.pi, N)
 
-x = a*np.cos(theta)
-y = b*np.sin(theta)
+    a = 1
+    b = 1.5
+    c = np.sqrt(a*a+b*b)
 
-x, y = rotate_points(x, y, np.pi/4)
+    x = a*np.cos(theta)
+    y = b*np.sin(theta)
 
-sun = np.array([c, 0])
+    x, y = rotate_points(x, y, np.pi/4)
 
-ps = np.array([x, y]).transpose()
+    sun = np.array([c, 0])
+
+    ps = np.array([x, y]).transpose()
 
 # %%
 
@@ -72,18 +74,19 @@ def find_dA(sun, p1, p2, p3):
     return triangle + simpsons - trapezoid
 
 
-# print(triangle_area(sun, ps[0], ps[1])*2)
-# sample usage, find the area of the entire circle. Just as accurate with 100 samples as with 10 samples :)
-tot_area = 0
-for i in range(0, int(N/2)):
-    # print(ps[i])
+if __name__ == '__main__':
+    # print(triangle_area(sun, ps[0], ps[1])*2)
+    # sample usage, find the area of the entire circle. Just as accurate with 100 samples as with 10 samples :)
+    tot_area = 0
+    for i in range(0, int(N/2)):
+        # print(ps[i])
 
-    tot_area += find_dA(sun, ps[i], ps[i+1], ps[i+2])
-    # v1, v2, v3 = ps[i] + sun, ps[i+1] + sun, ps[i+2] + sun
-    # tot_area += find_dA(sun, v1, v2, v3)
+        tot_area += find_dA(sun, ps[i], ps[i+1], ps[i+2])
+        # v1, v2, v3 = ps[i] + sun, ps[i+1] + sun, ps[i+2] + sun
+        # tot_area += find_dA(sun, v1, v2, v3)
 
 
-print("Area of the ellipse:", (np.pi*a*b))
-print("Approximation using Simpson's rule:", (tot_area))
-print("Accuracy:", (tot_area/np.pi/a/b * 100), "%")
+    print("Area of the ellipse:", (np.pi*a*b))
+    print("Approximation using Simpson's rule:", (tot_area))
+    print("Accuracy:", (tot_area/np.pi/a/b * 100), "%")
 
