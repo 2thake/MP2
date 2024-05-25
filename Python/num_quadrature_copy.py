@@ -15,19 +15,20 @@ if __name__ == '__main__':
 
     # sample unit circle path to show the area comes out to pi
 
-    N = 101
+    N = 9
     theta = np.linspace(0, 2*np.pi, N)
 
-    a = 1
-    b = 1.5
-    c = np.sqrt(a*a+b*b)
+    a = 1.5
+    b = 1
+    c = np.sqrt(a*a-b*b)
 
     x = a*np.cos(theta)
     y = b*np.sin(theta)
 
-    x, y = rotate_points(x, y, np.pi/4)
+    # x, y = rotate_points(x, y, np.pi/4)
 
-    sun = np.array([c, 0])
+    # sun = np.array([c, 0])
+    sun = np.array([0.5, 0.5])
 
     ps = np.array([x, y]).transpose()
 
@@ -65,28 +66,36 @@ def rectangle_area(x, y):
 # his rule, and a trapezoid which is below that curve.
 # subtracts the trapezoid from the sum of Simpsons rule and 
 def find_dA(sun, p1, p2, p3):
-    p1, p2, p3 = p1+sun, p2+sun, p3+sun
-    result = rotate_to_x_axis(p1 - sun, p2 - sun, p3 - sun)
+    result = rotate_to_x_axis(p1, p2, p3)
     triangle = triangle_area(sun, p1, p3)
     simpsons = simpsons_area(result[2], result[1], result[0])
-    trapezoid = rectangle_area(np.abs(result[0][0]-result[2][0]), result[0][1])
+    rectangle = rectangle_area(np.abs(result[0][0]-result[2][0]), result[0][1])
 
-    return triangle + simpsons - trapezoid
+    return triangle + simpsons - rectangle
 
 
 if __name__ == '__main__':
     # print(triangle_area(sun, ps[0], ps[1])*2)
     # sample usage, find the area of the entire circle. Just as accurate with 100 samples as with 10 samples :)
     tot_area = 0
+    tot_area_euler = 0
     for i in range(0, int(N/2)):
-        # print(ps[i])
-
-        tot_area += find_dA(sun, ps[i], ps[i+1], ps[i+2])
+        tot_area += find_dA(sun, ps[2*i], ps[2*i+1], ps[2*i+2])
         # v1, v2, v3 = ps[i] + sun, ps[i+1] + sun, ps[i+2] + sun
         # tot_area += find_dA(sun, v1, v2, v3)
+        tot_area_euler += triangle_area(sun, ps[2*i], ps[2*i+1])
+        tot_area_euler += triangle_area(sun, ps[2*i+1], ps[2*i+2])
 
 
+    print(f'Number of samples: {N-1}')
     print("Area of the ellipse:", (np.pi*a*b))
-    print("Approximation using Simpson's rule:", (tot_area))
+    print("Approximation using Simpson's rule:", tot_area)
+    print("Approximation using Euler's Method Exclusively:", tot_area_euler)
     print("Accuracy:", (tot_area/np.pi/a/b * 100), "%")
+    print("Exclusive Euler Accuracy:", tot_area_euler/np.pi/a/b * 100, "%")
+
+    # plt.scatter(sun[0], sun[1])
+    # plt.axis('equal')
+    # plt.plot(ps.transpose()[0], ps.transpose()[1])
+    # plt.show()
 

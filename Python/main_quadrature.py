@@ -5,7 +5,7 @@ from planet import Planet
 # from animation import animate
 from initial_value_solver import  RungeKutta4_v1, ABM_4
 from body_problem import calculating_C
-from num_quadrature_copy import find_dA
+from num_quadrature_copy import find_dA, triangle_area
 import matplotlib.pyplot as plt
 import os
 
@@ -54,11 +54,11 @@ Storage = ABM_4(initial4, H, N, C_val)
 
 
 def truncate_path(path, sun_pos, orbital_period, h):
-    diff = path[0] - sun_2D
+    diff = path[0] - sun_pos
     threshold_angle = 2*np.pi*H/orbital_period
     theta_init = np.arctan2(diff[1], diff[0])
     for i in range(10, len(path)):
-        diff = path[i]-sun_2D
+        diff = path[i]-sun_pos
         theta = np.arctan2(diff[1], diff[0])
         if np.isclose(theta, theta_init, atol=threshold_angle) and theta < theta_init:
             end_index = i
@@ -66,49 +66,64 @@ def truncate_path(path, sun_pos, orbital_period, h):
     
     return path[:end_index]
 
-sun_2D = np.array([sun.position[0], sun.position[1]])
+# sun_2D = np.array([sun.position[0], sun.position[1]])
+sun_2D = np.array([0, 0])
 
-path = np.array([Storage[0], Storage[1]]).transpose()
 
-orbital_period = 60000
+
 names = ['Jupiter', 'Saturn', 'Uranus', 'Neptune']
+orbital_periods = [11.86*365, 29.4*365, 84*365, 165*365]
 
 
 paths = []
 for i in range(len(names)):
     path = np.array([Storage[3*i], Storage[3*i+1]]).transpose()
-    path = truncate_path(path, sun_2D, orbital_period, H)
+    path = truncate_path(path, sun_2D, orbital_periods[i], H)
     paths.append(path)
-    plt.plot(path.transpose()[0], path.transpose()[1])
-
-
-
-# plt.plot(path.transpose()[0], path.transpose()[1])
-plt.scatter(sun.position[0], sun.position[1])
-plt.axis('equal')
-plt.show()
-
 
 areas = []
+areas_euler = []
 for j in range(0, len(names)):
     area_slice = []
-    print(names[j])
+    area_slice_euler = []
     for i in range(5, int((len(paths[j])-2)/2)):
         area_slice.append(find_dA(sun_2D, paths[j][2*i], paths[j][2*i+1], paths[j][2*i+2]))
+        dA_euler = 0
+        dA_euler += triangle_area(sun_2D, paths[j][2*i], paths[j][2*i+1])
+        dA_euler += triangle_area(sun_2D, paths[j][2*i+2], paths[j][2*i+1])
+        area_slice_euler.append(dA_euler)
     areas.append(area_slice)
-    plt.plot(area_slice, label=names[j])
+    areas_euler.append(area_slice_euler)
     
+for i in range(2, 3): #, len(names)):
+    plt.plot(np.linspace(0, 1, len(areas[i])), areas[i], 'o-', label=names[i])
+    plt.plot(np.linspace(0, 1, len(areas[i])), areas_euler[i], 'x-', label=names[i])
 
+
+max_dev = []
+max_dev_euler = []
+for i in range(0, len(names)):
+    max_dev_euler.append(max(areas_euler[i]) - min(areas_euler[i]))
+    max_dev.append(max(areas[i]) - min(areas[i]))
+
+print("Max Variation in Areas:")
+for i in range(0, len(names)):
+    print(names[i]+':')
+    print("Euler:", max_dev_euler[i])
+    print("Simpson\'s:", max_dev[i])
+
+print("Ratio of Deviations (Euler/Simpson)")
+for i, j, p in zip(max_dev_euler, max_dev, names):
+    print(p+':', i/j)
 
 plt.title(f'Area Traced by Each Planet in {H}-Day Timesteps')
-plt.xlabel(r'Area ($AU^2$)')
-plt.ylabel(r'Timestep (n)')
+plt.ylabel(r'Area ($AU^2$)')
+plt.xlabel(r'Timestep (n)')
 plt.legend(loc='lower right')
-# plt.ylim(0, max([max(ar) for ar in paths])*1.2)
-plt.ylim(0, 10)
+# plt.ylim(0, max([max(ar) for ar in areas])*1.2)
+scale = 100000
+plt.ylim(min(areas_euler[2])-1/scale, max(areas[2])+1/scale)
 plt.show()
 
-
-# animate(Storage, planets)
 
 # %%
