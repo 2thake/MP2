@@ -5,10 +5,15 @@ import matplotlib.pyplot as plt
 import math
 
 # %%
+def rotate_points(x, y, rad):
+    cos_a, sin_a = np.cos(rad), np.sin(rad)
+    x_new = cos_a * np.array(x) - sin_a * np.array(y)
+    y_new = sin_a * np.array(x) + cos_a * np.array(y)
+    return x_new.tolist(), y_new.tolist()
 
 # sample unit circle path to show the area comes out to pi
 
-N = 9
+N = 101
 theta = np.linspace(0, 2*np.pi, N)
 
 a = 1
@@ -18,46 +23,13 @@ c = np.sqrt(a*a+b*b)
 x = a*np.cos(theta)
 y = b*np.sin(theta)
 
+x, y = rotate_points(x, y, np.pi/4)
+
 sun = np.array([c, 0])
 
 ps = np.array([x, y]).transpose()
 
 # %%
-
-
-# dont remember what I even wrote this for
-# def find_area(sun_path, path, start, end): 
-#     start = int(start)
-#     end = int(end)
-#     area = 0
-#     focus = path[start:end]
-#     for i in range(end-start):
-#         area += triangle_area(sun_path[i], path[i], path[i+1])
-    
-#     return area
-
-
-# dont remember what I wrote this for either
-# def find_area_simpsons(sun_path, path, start_ind, end_ind):
-#     start = int(start)
-#     end = int(end)
-#     area = 0
-#     focus = path[start_ind:end_ind]
-#     for i in range(end-start):
-#         area += triangle_area(sun_path[i], path[i], path[i+1])
-
-
-# old unused version of the rotate_to_y_axis function
-# def rotate_vectors(v1, v2, v3):
-#     angle = np.arctan2(v2[0], v2[1])
-#     print(angle)
-#     rotation_matrix = np.array([[np.cos(-angle), -np.sin(-angle)], [np.sin(-angle), np.cos(-angle)]])
-#     return [np.dot(rotation_matrix, v1), np.dot(rotation_matrix, v2), np.dot(rotation_matrix, v3)]
-
-def calculate_angle(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    return math.degrees(math.atan2(y2 - y1, x2 - x1))
 
 def triangle_area(v1, v2, v3):
     x1, y1 = v1
@@ -66,13 +38,9 @@ def triangle_area(v1, v2, v3):
     return abs((x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2)) / 2)
 
 # rotate 3 vectors so the middle one points directly upwards. Simpson rule can be applied after this
-def rotate_to_y_axis(p1, p2, p3):
+def rotate_to_x_axis(p1, p2, p3):
     diff = p3-p1
     angle = math.atan2(diff[0], diff[1]) + np.pi/2
-    
-    p1p = rotate_vector(p1, angle)
-    p2p = rotate_vector(p2, angle)
-    p3p = rotate_vector(p3, angle)
     
     return [rotate_vector(p1, angle), rotate_vector(p2, angle), rotate_vector(p3, angle)]
 
@@ -85,7 +53,7 @@ def rotate_vector(vector, angle):
 
 # points need to be in a certain order here: left to right. I'll fix this later
 def simpsons_area(p1, p2, p3):
-    return (p3[0]-p1[0])/6 * (p1[1] + 4*p2[1] + p3[1])
+    return np.abs(p3[0]-p1[0])/6 * (p1[1] + 4*p2[1] + p3[1])
 
 def rectangle_area(x, y):
     return x*y
@@ -96,7 +64,7 @@ def rectangle_area(x, y):
 # subtracts the trapezoid from the sum of Simpsons rule and 
 def find_dA(sun, p1, p2, p3):
     p1, p2, p3 = p1+sun, p2+sun, p3+sun
-    result = rotate_to_y_axis(p1 - sun, p2 - sun, p3 - sun)
+    result = rotate_to_x_axis(p1 - sun, p2 - sun, p3 - sun)
     triangle = triangle_area(sun, p1, p3)
     simpsons = simpsons_area(result[2], result[1], result[0])
     trapezoid = rectangle_area(np.abs(result[0][0]-result[2][0]), result[0][1])
@@ -114,7 +82,8 @@ for i in range(0, int(N/2)):
     # v1, v2, v3 = ps[i] + sun, ps[i+1] + sun, ps[i+2] + sun
     # tot_area += find_dA(sun, v1, v2, v3)
 
-print(tot_area)
-print(np.pi*a*b)
 
-print(tot_area/np.pi/a/b)
+print("Area of the ellipse:", (np.pi*a*b))
+print("Approximation using Simpson's rule:", (tot_area))
+print("Accuracy:", (tot_area/np.pi/a/b * 100), "%")
+
