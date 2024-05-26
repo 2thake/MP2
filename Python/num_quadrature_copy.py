@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # x, y = rotate_points(x, y, np.pi/4)
 
     # sun = np.array([c, 0])
-    sun = np.array([0.5, 0.5])
+    sun = np.array([1, 0])
 
     ps = np.array([x, y]).transpose()
 
@@ -54,24 +54,98 @@ def rotate_vector(vector, angle):
     sin_theta = math.sin(angle)
     return (x * cos_theta - y * sin_theta, x * sin_theta + y * cos_theta)
 
-# points need to be in a certain order here: left to right. I'll fix this later
-def simpsons_area(p1, p2, p3):
-    return np.abs(p3[0]-p1[0])/6 * (p1[1] + 4*p2[1] + p3[1])
+def perpendicular_distance(v1, v2, v3):
+    line_vec = np.array(v2) - np.array(v1)
+    point_vec = np.array(v3) - np.array(v1)
+    proj_len = np.dot(point_vec, line_vec) / np.sqrt(np.dot(line_vec, line_vec))
+    proj_vec = (proj_len / np.sqrt(np.dot(line_vec, line_vec))) * line_vec
+    dist_vec = point_vec - proj_vec
+    return np.sqrt(np.dot(dist_vec, dist_vec))
 
-def rectangle_area(x, y):
-    return x*y
+def distance_between_vectors(v1, v2):
+    diff_vec = np.array(v2) - np.array(v1)
+    return np.sqrt(np.dot(diff_vec, diff_vec))
+
+
+# function to calculate Simpson's rule. Vectors are split so default values can be included.
+# all values default to zero
+def simpsons_area(x1=0, x2=0, x3=0, y1=0, y2=0, y3=0):
+    return np.abs(x3-x1)/6 * (y1 + 4*y2 + y3)
+
 
 # Final function: putting it all together
 # finds the area of the triangle between the three points, along with the area under simpsons curve using
 # his rule, and a trapezoid which is below that curve.
 # subtracts the trapezoid from the sum of Simpsons rule and 
 def find_dA(sun, p1, p2, p3):
-    result = rotate_to_x_axis(p1, p2, p3)
+    d1 = distance_between_vectors(p1, p2)
+    d2 = perpendicular_distance(p1, p2, p3)
     triangle = triangle_area(sun, p1, p3)
-    simpsons = simpsons_area(result[2], result[1], result[0])
-    rectangle = rectangle_area(np.abs(result[0][0]-result[2][0]), result[0][1])
+    simpsons = simpsons_area(x1=-d1/2, y2=d2, x3=d1/2)
 
-    return triangle + simpsons - rectangle
+    return triangle + simpsons
+
+def find_tot_area(sun, path):
+    tot_area = 0
+    for i in range(0, int(N/2)):
+        tot_area += find_dA(sun, ps[2*i], ps[2*i+1], ps[2*i+2])
+
+def furthest_point_from_line(v1, v2, points):
+    distances = [perpendicular_distance(v1, v2, point) for point in points]
+    max_index = np.argmax(distances)
+    return points[max_index], distances[max_index]
+
+
+def furthest_points(points):
+    max_distance = 0
+    point_pair = (points[0], points[1])
+    for i in range(len(points)):
+        for j in range(i + 1, len(points)):
+            dist = distance_between_vectors(points[i], points[j])
+            if dist > max_distance:
+                max_distance = dist
+                point_pair = (points[i], points[j])
+    return point_pair, max_distance
+
+def find_ellipse_axes(points):
+    vertices, semi_major = furthest_points(points)
+    _, semi_minor = furthest_point_from_line(vertices[0], vertices[1], points)
+    return semi_major/2, semi_minor
+
+def points_x_units_away(point1, point2, x):
+    midpoint = ((point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2)
+    dir_vector1 = (point1[0] - midpoint[0], point1[1] - midpoint[1])
+    dir_vector2 = (point2[0] - midpoint[0], point2[1] - midpoint[1])
+    length1 = np.sqrt(dir_vector1[0]**2 + dir_vector1[1]**2)
+    length2 = np.sqrt(dir_vector2[0]**2 + dir_vector2[1]**2)
+    unit_vector1 = (dir_vector1[0] / length1, dir_vector1[1] / length1)
+    unit_vector2 = (dir_vector2[0] / length2, dir_vector2[1] / length2)
+    displacement1 = (unit_vector1[0] * x, unit_vector1[1] * x)
+    displacement2 = (unit_vector2[0] * x, unit_vector2[1] * x)
+    final_point1 = (midpoint[0] + displacement1[0], midpoint[1] + displacement1[1])
+    final_point2 = (midpoint[0] + displacement2[0], midpoint[1] + displacement2[1])
+    return [final_point1, final_point2]
+
+def find_foci(path):
+    vertices, semi_major = furthest_points(path)
+    semi_major /= 2
+    _, semi_minor = furthest_point_from_line(vertices[0], vertices[1], path)
+    c = np.sqrt(semi_major*semi_major - semi_minor*semi_minor)
+
+    return points_x_units_away(vertices[0], vertices[1], c)
+
+def dist_to_closest_focus(sun, path):
+    foci = np.array(find_foci(path))
+    d0 = distance_between_vectors(sun, foci[0])
+    d1 = distance_between_vectors(sun, foci[1])
+
+    if d0 < d1:
+        return d0
+    else:
+        return d1
+
+
+
 
 
 if __name__ == '__main__':
@@ -81,18 +155,38 @@ if __name__ == '__main__':
     tot_area_euler = 0
     for i in range(0, int(N/2)):
         tot_area += find_dA(sun, ps[2*i], ps[2*i+1], ps[2*i+2])
-        # v1, v2, v3 = ps[i] + sun, ps[i+1] + sun, ps[i+2] + sun
-        # tot_area += find_dA(sun, v1, v2, v3)
         tot_area_euler += triangle_area(sun, ps[2*i], ps[2*i+1])
         tot_area_euler += triangle_area(sun, ps[2*i+1], ps[2*i+2])
 
+    vertices, semi_major = furthest_points(ps)
+    semi_major /= 2
+    _, semi_minor = furthest_point_from_line(vertices[0], vertices[1], ps)
+    # print(semi_minor, semi_major)
+    c = np.sqrt(semi_major*semi_major - semi_minor*semi_minor)
 
-    print(f'Number of samples: {N-1}')
-    print("Area of the ellipse:", (np.pi*a*b))
-    print("Approximation using Simpson's rule:", tot_area)
-    print("Approximation using Euler's Method Exclusively:", tot_area_euler)
-    print("Accuracy:", (tot_area/np.pi/a/b * 100), "%")
-    print("Exclusive Euler Accuracy:", tot_area_euler/np.pi/a/b * 100, "%")
+    # print(c)
+
+    # print(points_x_units_away(vertices[0], vertices[1], c))
+
+    print(find_foci(ps))
+    print(dist_to_closest_focus(sun, ps))
+
+    
+
+    
+
+    # h, j = furthest_points(ps)
+    # print(h, j)
+    # print(furthest_point_from_line(h[0], h[1], ps))
+
+
+
+    # print(f'Number of samples: {N-1}')
+    # print("Area of the ellipse:", (np.pi*a*b))
+    # print("Approximation using Simpson's rule:", tot_area)
+    # print("Approximation using Euler's Method Exclusively:", tot_area_euler)
+    # print("Accuracy:", (tot_area/np.pi/a/b * 100), "%")
+    # print("Exclusive Euler Accuracy:", tot_area_euler/np.pi/a/b * 100, "%")
 
     # plt.scatter(sun[0], sun[1])
     # plt.axis('equal')

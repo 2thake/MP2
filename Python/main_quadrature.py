@@ -6,6 +6,7 @@ from planet import Planet
 from initial_value_solver import  RungeKutta4_v1, ABM_4
 from body_problem import calculating_C
 from num_quadrature_copy import find_dA, triangle_area
+import num_quadrature_copy as quad
 import matplotlib.pyplot as plt
 import os
 
@@ -34,7 +35,7 @@ distance = [sun.position, jupiter.position, saturn.position, uranus.position, ne
 velocity = [jupiter.velocity, saturn.velocity, uranus.velocity, neptune.velocity]
 
 N = 1000
-H = 100
+H = 50
 distance = np.concatenate(distance).tolist()
 velocity = np.concatenate(velocity).tolist()
 
@@ -64,15 +65,15 @@ def truncate_path(path, sun_pos, orbital_period, h):
             end_index = i
             break
     
-    return path[:end_index]
+    return path# [:end_index]
 
-# sun_2D = np.array([sun.position[0], sun.position[1]])
-sun_2D = np.array([0, 0])
+sun_2D = np.array([sun.position[0], sun.position[1]])
+# sun_2D = np.array([0, 0])
 
 
 
 names = ['Jupiter', 'Saturn', 'Uranus', 'Neptune']
-orbital_periods = [11.86*365, 29.4*365, 84*365, 165*365]
+orbital_periods = [11.86*365, 29.4*365, 84.0*365, 165.0*365]
 
 
 paths = []
@@ -83,9 +84,12 @@ for i in range(len(names)):
 
 areas = []
 areas_euler = []
+# semi_majors = []
 for j in range(0, len(names)):
     area_slice = []
     area_slice_euler = []
+    semi_major, _ = quad.find_ellipse_axes(paths[j])
+    # semi_majors.append(semi_major)
     for i in range(5, int((len(paths[j])-2)/2)):
         area_slice.append(find_dA(sun_2D, paths[j][2*i], paths[j][2*i+1], paths[j][2*i+2]))
         dA_euler = 0
@@ -94,10 +98,24 @@ for j in range(0, len(names)):
         area_slice_euler.append(dA_euler)
     areas.append(area_slice)
     areas_euler.append(area_slice_euler)
-    
-for i in range(2, 3): #, len(names)):
-    plt.plot(np.linspace(0, 1, len(areas[i])), areas[i], 'o-', label=names[i])
-    plt.plot(np.linspace(0, 1, len(areas[i])), areas_euler[i], 'x-', label=names[i])
+
+
+# plt.plot(np.power(orbital_periods, 2), np.power(semi_majors, 3), 'r-')
+# for i in range(0, 4):
+#     plt.plot([np.power(np.abs(orbital_periods[i]), 2)], [np.power(semi_majors[i], 3)], 'o', label=names[i])
+
+
+
+# plt.title('Verification of Kepler\'s Third Law')
+# plt.xlabel('Square of the Orbital Period')
+# plt.ylabel('Cube of the Semi-Major Axis')
+# plt.legend()
+# plt.show()
+
+
+for i in range(0, len(names)):
+    plt.plot(areas[i]-areas[i][0], '-', label=names[i])
+    # plt.plot(np.linspace(0, 1, len(areas[i])), areas_euler[i], 'x-', label=names[i])
 
 
 max_dev = []
@@ -116,13 +134,14 @@ print("Ratio of Deviations (Euler/Simpson)")
 for i, j, p in zip(max_dev_euler, max_dev, names):
     print(p+':', i/j)
 
-plt.title(f'Area Traced by Each Planet in {H}-Day Timesteps')
+plt.title(f'Variation in Area Traced by Each Planet in each {H}-Day Timestep')
 plt.ylabel(r'Area ($AU^2$)')
 plt.xlabel(r'Timestep (n)')
 plt.legend(loc='lower right')
 # plt.ylim(0, max([max(ar) for ar in areas])*1.2)
-scale = 100000
-plt.ylim(min(areas_euler[2])-1/scale, max(areas[2])+1/scale)
+scale = 100
+# plt.ylim(min(areas_euler[2])-1/scale, max(areas[2])+1/scale)
+plt.ylim(-1/scale, 1/scale)
 plt.show()
 
 
